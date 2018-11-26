@@ -8,7 +8,7 @@
         {{ range .Todos }}
         <li {{ if not .Active }}class="completed"{{ end }}>
             <div class="view">
-                <input single-action="/toggle?item={{ .ID }}" method="POST" class="toggle" name="completed" value="completed" type="checkbox" {{ if not .Active }}checked{{ end }}>
+                <input input-submit="/toggle?item={{ .ID }}" method="POST" class="toggle" name="completed" value="completed" type="checkbox" {{ if not .Active }}checked{{ end }}>
                 <label>{{ .Content }}</label>
                 <button class="destroy"></button>
             </div>

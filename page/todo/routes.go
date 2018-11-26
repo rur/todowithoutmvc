@@ -1,7 +1,7 @@
 package todo
 
 import (
-	"github.com/rur/todonomvc/page"
+	"github.com/rur/todowithoutmvc/page"
 	"github.com/rur/treetop"
 )
 
@@ -29,6 +29,8 @@ func Routes(server page.Server, m page.Mux, renderer *treetop.Renderer) {
 	m.Handle("/active", todo.PartialHandler().Include(footer))
 	m.Handle("/completed", todo.PartialHandler().Include(footer))
 
+	// None treetop view handlers
+	// I'm using POST redirect GET for all side-effect endpoints
 	m.HandleFunc("/clear", clearHandler(server))
 	m.HandleFunc("/create", createHandler(server))
 	m.HandleFunc("/toggle", toggleHandler(server))

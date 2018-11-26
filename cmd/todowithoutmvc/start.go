@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/rur/todonomvc"
-	"github.com/rur/todonomvc/page"
-	"github.com/rur/todonomvc/page/todo"
+	"github.com/rur/todowithoutmvc"
+	"github.com/rur/todowithoutmvc/page"
+	"github.com/rur/todowithoutmvc/page/todo"
 	"github.com/rur/treetop"
 )
 
@@ -27,13 +27,13 @@ func main() {
 	m.Handle("/node_modules/", http.StripPrefix("/node_modules/", modules))
 
 	server := page.NewServer(
-		todonomvc.NewMemoryRepo(),
+		todowithoutmvc.NewMemoryRepo(),
 	)
 
 	renderer := treetop.NewRenderer(treetop.DefaultTemplateExec)
 	todo.Routes(server, m, renderer)
 
-	fmt.Printf("Starting github.com/rur/todonomvc server at %s", addr)
+	fmt.Printf("Starting github.com/rur/todowithoutmvc server at %s", addr)
 	// Bind to an addr and pass our router in
 	log.Fatal(http.ListenAndServe(addr, m))
 }

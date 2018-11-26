@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/rur/todonomvc"
-	"github.com/rur/todonomvc/page"
+	"github.com/rur/todowithoutmvc"
+	"github.com/rur/todowithoutmvc/page"
 	"github.com/rur/treetop"
 )
 
@@ -62,7 +62,7 @@ func todoHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) in
 	}
 
 	return struct {
-		Todos []todonomvc.Todo
+		Todos []todowithoutmvc.Todo
 	}{
 		Todos: filtered.List(),
 	}
@@ -122,7 +122,7 @@ func createHandler(server page.Server) http.HandlerFunc {
 	}
 }
 
-// Doc: Update existing todo entry
+// Doc: Toggle completeness of existing todo entry
 func toggleHandler(server page.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if strings.ToLower(req.Method) != "post" {

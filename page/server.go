@@ -7,19 +7,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rur/todonomvc"
+	"github.com/rur/todowithoutmvc"
 	"github.com/rur/treetop"
 )
 
-var CookieName = "todonomvc-session"
+var CookieName = "todowithoutmvc-session"
 
 type Server interface {
 	Bind(ResourcesHandler) treetop.HandlerFunc
-	LoadTodos(*http.Request) (todonomvc.Todos, string)
-	SaveTodos(string, todonomvc.Todos) error
+	LoadTodos(*http.Request) (todowithoutmvc.Todos, string)
+	SaveTodos(string, todowithoutmvc.Todos) error
 }
 
-func NewServer(repo todonomvc.Repository) Server {
+func NewServer(repo todowithoutmvc.Repository) Server {
 	return &server{
 		responses: make(map[uint32]*Resources),
 		repo:      repo,
@@ -29,7 +29,7 @@ func NewServer(repo todonomvc.Repository) Server {
 type server struct {
 	sync.RWMutex
 	responses map[uint32]*Resources
-	repo      todonomvc.Repository
+	repo      todowithoutmvc.Repository
 }
 
 func (s *server) Bind(f ResourcesHandler) treetop.HandlerFunc {
@@ -59,7 +59,7 @@ func (s *server) Bind(f ResourcesHandler) treetop.HandlerFunc {
 	}
 }
 
-func (s *server) LoadTodos(req *http.Request) (todonomvc.Todos, string) {
+func (s *server) LoadTodos(req *http.Request) (todowithoutmvc.Todos, string) {
 	var key string
 	if cookie, err := req.Cookie(CookieName); err == nil {
 		key = cookie.Value
@@ -75,7 +75,7 @@ func (s *server) LoadTodos(req *http.Request) (todonomvc.Todos, string) {
 	}
 }
 
-func (s *server) SaveTodos(key string, list todonomvc.Todos) error {
+func (s *server) SaveTodos(key string, list todowithoutmvc.Todos) error {
 	if key == "" {
 		return errors.New("Cannot save todo list with an empty key")
 	}

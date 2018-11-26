@@ -1,4 +1,4 @@
-namespace: github.com/rur/todonomvc
+namespace: github.com/rur/todowithoutmvc
 pages:
   - name: todo
     doc: Todo *No* MVC base template

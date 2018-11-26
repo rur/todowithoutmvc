@@ -1,4 +1,4 @@
-package todonomvc
+package todowithoutmvc
 
 import (
 	"errors"

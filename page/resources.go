@@ -3,12 +3,12 @@ package page
 import (
 	"net/http"
 
-	"github.com/rur/todonomvc"
+	"github.com/rur/todowithoutmvc"
 	"github.com/rur/treetop"
 )
 
 type Resources struct {
-	Todos todonomvc.Todos
+	Todos todowithoutmvc.Todos
 }
 
 type Mux interface {

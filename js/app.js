@@ -4,10 +4,13 @@
 
 	window.treetop.init({
 		'mountAttrs': {
-			'single-action': (elm) => {
+			'input-submit': (elm) => {
 				// allows a single input element to be treated as if it is a form.
 				// for the purpose of treetop requests
-				const url = elm.getAttribute('single-action');
+				const url = elm.getAttribute('input-submit');
+				if (url === null) {
+					return;
+				}
 				var type = (elm.getAttribute('type') || 'text').toUpperCase();
 				var method = elm.getAttribute('method');
 				switch (method.toUpperCase()) {
@@ -21,7 +24,7 @@
 					break;
 
 				default:
-					throw new Error('Single-action component: unsupported method ' + method);
+					throw new Error('input-submit component: unsupported method ' + method);
 				}
 
 				elm.addEventListener('click', () => {
