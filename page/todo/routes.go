@@ -30,4 +30,6 @@ func Routes(server page.Server, m page.Mux, renderer *treetop.Renderer) {
 	m.Handle("/completed", todo.PartialHandler().Include(footer))
 
 	m.HandleFunc("/clear", clearHandler(server))
+	m.HandleFunc("/create", createHandler(server))
+	m.HandleFunc("/toggle", toggleHandler(server))
 }

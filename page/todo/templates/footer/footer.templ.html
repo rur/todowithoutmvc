@@ -1,7 +1,7 @@
 {{ block "footer" . }}
-<footer id="footer" class="footer">
+<footer id="footer" class="footer {{ if and (eq .ActiveCount 0) (eq .CompletedCount 0)  }}hide{{ end }}">
     <!-- This should be `0 items left` by default -->
-    <span class="todo-count"><strong>{{ .Count }}</strong> {{ .Label }}</span>
+    <span class="todo-count"><strong>{{ .ActiveCount }}</strong> {{ .Label }}</span>
     <!-- Remove this if you don't implement routing -->
     <ul class="filters">
         <li>
@@ -14,7 +14,9 @@
             <a {{ if eq .Page "completed" }}class="selected"{{ end }} treetop href="/completed">Completed</a>
         </li>
     </ul>
+    {{ if .CompletedCount }}
     <!-- Hidden if no completed items are left ↓ -->
-    <button class="clear-completed" treetop-link="/clear?redirect={{.Page}}">Clear completed</button>
+    <form action="/clear" method="POST"><button class="clear-completed">Clear completed</button></form>
+    {{ end }}
 </footer>
 {{ end }}

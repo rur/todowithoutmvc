@@ -8,8 +8,7 @@ import (
 )
 
 type Resources struct {
-	Todos  todonomvc.Todos
-	Update func(todonomvc.Todos) error
+	Todos todonomvc.Todos
 }
 
 type Mux interface {

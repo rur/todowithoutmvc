@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Template • TodoMVC</title>
+		<title>Treetop • Todo *NOT* MVC</title>
 		<link rel="stylesheet" href="/node_modules/todomvc-common/base.css">
 		<link rel="stylesheet" href="/node_modules/todomvc-app-css/index.css">
 		<!-- CSS overrides - remove if you don't need it -->
@@ -13,12 +13,12 @@
 		<section class="todoapp">
 			<header class="header">
 				<h1>todos</h1>
-				<input class="new-todo" placeholder="What needs to be done?" autofocus>
+				<form treetop action="/create" method="POST"><input type="text" name="todo" class="new-todo" placeholder="What needs to be done?" autofocus></form>
 			</header>
-            {{ block "main" .Main }}
+			{{ block "main" .Main }}
 			<!-- This section should be hidden by default and shown when there are todos -->
 			{{ end }}
-            {{ block "footer" .Footer }}
+			{{ block "footer" .Footer }}
 			<!-- This footer should hidden by default and shown when there are todos -->
 			{{ end }}
 		</section>

@@ -43,15 +43,10 @@ func (s *server) Bind(f ResourcesHandler) treetop.HandlerFunc {
 			todos, key := s.LoadTodos(req)
 			if key == "" {
 				// no todos key has been recorded, set a new cookie
-				key = createTodoCookie(rsp)
+				key = CreateTodoCookie(rsp)
 			}
 
-			rsc = &Resources{
-				todos,
-				func(todos todonomvc.Todos) error {
-					return s.SaveTodos(key, todos)
-				},
-			}
+			rsc = &Resources{todos}
 
 			s.setResources(respId, rsc)
 			go func() {
@@ -114,7 +109,7 @@ func (s *server) deleteResources(respId uint32) {
 	delete(s.responses, respId)
 }
 
-func createTodoCookie(w http.ResponseWriter) string {
+func CreateTodoCookie(w http.ResponseWriter) string {
 	key := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
 	cookie := http.Cookie{
 		Name:    CookieName,

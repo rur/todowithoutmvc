@@ -1,39 +1,135 @@
 package todonomvc
 
+import (
+	"errors"
+	"fmt"
+	"strconv"
+	"strings"
+)
+
 type Todo struct {
 	Active  bool
 	ID      string
 	Content string
 }
 
-type Todos []Todo
-
-func (t Todos) ActiveOnly() Todos {
-	filtered := t[:0]
-	for _, todo := range t {
-		if todo.Active {
-			filtered = append(filtered, todo)
-		}
-	}
-	return filtered
+type Todos interface {
+	ActiveOnly() Todos
+	ActiveCount() int
+	CompletedCount() int
+	List() []Todo
+	CompletedOnly() Todos
+	AddEntry(string) (Todos, error)
+	GetEntry(string) (*Todo, bool)
+	UpdateEntry(Todo) (Todos, error)
 }
 
-func (t Todos) CompletedOnly() Todos {
-	filtered := t[:0]
-	for _, todo := range t {
-		if !todo.Active {
-			filtered = append(filtered, todo)
-		}
-	}
-	return filtered
-}
-
-type Repository map[string][]Todo
+type Repository map[string]Todos
 
 func NewMemoryRepo() Repository {
 	return make(Repository)
 }
 
 func (r *Repository) NewTodos() Todos {
-	return make(Todos, 0)
+	return &todos{
+		list:   make([]Todo, 0),
+		lastID: 0,
+	}
+}
+
+type todos struct {
+	list   []Todo
+	lastID int
+}
+
+func (t *todos) ActiveOnly() Todos {
+	filtered := t.list[:0]
+	for _, todo := range t.list {
+		if todo.Active {
+			filtered = append(filtered, todo)
+		}
+	}
+	return &todos{
+		list:   filtered,
+		lastID: t.lastID,
+	}
+}
+
+func (t *todos) ActiveCount() int {
+	count := 0
+	for _, todo := range t.list {
+		if todo.Active {
+			count = count + 1
+		}
+	}
+	return count
+}
+
+func (t *todos) CompletedCount() int {
+	count := 0
+	for _, todo := range t.list {
+		if !todo.Active {
+			count = count + 1
+		}
+	}
+	return count
+}
+
+func (t *todos) List() []Todo {
+	return t.list
+}
+
+func (t *todos) CompletedOnly() Todos {
+	filtered := t.list[:0]
+	for _, todo := range t.list {
+		if !todo.Active {
+			filtered = append(filtered, todo)
+		}
+	}
+	return &todos{
+		list:   filtered,
+		lastID: t.lastID,
+	}
+}
+
+func (t *todos) AddEntry(msg string) (Todos, error) {
+	msg = strings.TrimSpace(msg)
+	if msg == "" {
+		return t, errors.New("Cannot create empty Todo item")
+	} else {
+		return &todos{
+			list: append(t.list, Todo{
+				Active:  true,
+				Content: msg,
+				ID:      strconv.FormatInt(int64(t.lastID+1), 10),
+			}),
+			lastID: t.lastID + 1,
+		}, nil
+	}
+}
+
+func (t *todos) GetEntry(id string) (*Todo, bool) {
+	for _, t := range t.list {
+		if t.ID == id {
+			return &t, true
+		}
+	}
+	return nil, false
+}
+
+func (t *todos) UpdateEntry(nue Todo) (Todos, error) {
+	var list []Todo
+	for i, ti := range t.list {
+		if ti.ID == nue.ID {
+			list = append(t.list[:i], append([]Todo{nue}, t.list[i+1:]...)...)
+			continue
+		}
+	}
+	if list == nil {
+		return t, fmt.Errorf("Entry not found with item ID %s", nue.ID)
+	}
+	return &todos{
+		list:   list,
+		lastID: t.lastID,
+	}, nil
 }

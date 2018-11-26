@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -26,26 +27,25 @@ func todoPageHandler(rsc page.Resources, rsp treetop.Response, req *http.Request
 // Doc: Status and controls for todo list
 func footerHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) interface{} {
 	data := struct {
-		Page  string
-		Count int
-		Label string
-	}{}
+		Page           string
+		ActiveCount    int
+		CompletedCount int
+		Label          string
+	}{
+		ActiveCount:    rsc.Todos.ActiveCount(),
+		CompletedCount: rsc.Todos.CompletedCount(),
+	}
+	if data.ActiveCount == 1 {
+		data.Label = "item left"
+	} else {
+		data.Label = "items left"
+	}
 	if strings.HasPrefix(req.RequestURI, "/active") {
 		data.Page = "active"
 	} else if strings.HasPrefix(req.RequestURI, "/completed") {
 		data.Page = "completed"
 	} else {
 		data.Page = "all"
-	}
-	for _, t := range rsc.Todos {
-		if t.Active {
-			data.Count = data.Count + 1
-		}
-	}
-	if data.Count == 1 {
-		data.Label = "item left"
-	} else {
-		data.Label = "items left"
 	}
 	return data
 }
@@ -64,13 +64,17 @@ func todoHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) in
 	return struct {
 		Todos []todonomvc.Todo
 	}{
-		Todos: filtered,
+		Todos: filtered.List(),
 	}
 }
 
 // Doc: Purge all non active todos and redirect afterwards
 func clearHandler(server page.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
+		if strings.ToLower(req.Method) != "post" {
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
 		todos, key := server.LoadTodos(req)
 		if key == "" {
 			http.Error(w, "Todo list was not found", http.StatusBadRequest)
@@ -81,7 +85,77 @@ func clearHandler(server page.Server) http.HandlerFunc {
 			http.Error(w, "Error saving todo list", http.StatusInternalServerError)
 			return
 		}
-		redirect := req.URL.Query().Get("redirect")
+		redirect := req.Referer()
+		if redirect == "" {
+			redirect = "/"
+		}
+		http.Redirect(w, req, redirect, http.StatusSeeOther)
+	}
+}
+
+// Doc: Create a new todo entry
+func createHandler(server page.Server) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		if strings.ToLower(req.Method) != "post" {
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
+		todos, key := server.LoadTodos(req)
+		if key == "" {
+			key = page.CreateTodoCookie(w)
+		}
+		value := strings.TrimSpace(req.FormValue("todo"))
+		updated, err := todos.AddEntry(value)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error creating todo entry: %s", err.Error()), http.StatusBadRequest)
+			return
+		}
+		if err := server.SaveTodos(key, updated); err != nil {
+			http.Error(w, "Error saving todo list", http.StatusInternalServerError)
+			return
+		}
+		redirect := req.Referer()
+		if redirect == "" {
+			redirect = "/"
+		}
+		http.Redirect(w, req, redirect, http.StatusSeeOther)
+	}
+}
+
+// Doc: Update existing todo entry
+func toggleHandler(server page.Server) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		if strings.ToLower(req.Method) != "post" {
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
+		todos, key := server.LoadTodos(req)
+		if key == "" {
+			http.Error(w, "Todo list was not found", http.StatusBadRequest)
+			return
+		}
+		itemID := strings.TrimSpace(req.URL.Query().Get("item"))
+
+		todo, ok := todos.GetEntry(itemID)
+		if !ok {
+			http.Error(w, fmt.Sprintf("Entry was not found for ID: %s", itemID), http.StatusBadRequest)
+			return
+		}
+
+		if strings.ToLower(strings.TrimSpace(req.FormValue("completed"))) != "completed" {
+			todo.Active = true
+		} else {
+			todo.Active = false
+		}
+		if updated, err := todos.UpdateEntry(*todo); err != nil {
+			http.Error(w, "Error saving todo list", http.StatusInternalServerError)
+			return
+		} else if err := server.SaveTodos(key, updated); err != nil {
+			http.Error(w, "Error saving todo list", http.StatusInternalServerError)
+			return
+		}
+
+		redirect := req.Referer()
 		if redirect == "" {
 			redirect = "/"
 		}
