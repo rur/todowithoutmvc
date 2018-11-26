@@ -1,0 +1,24 @@
+namespace: github.com/rur/todonomvc
+pages:
+  - name: todo
+    doc: Todo *No* MVC base template
+    uri: /
+    blocks:
+      main:
+        - name: landing
+          default: true
+          doc: List of all todos
+          path: /
+
+        - name: active
+          doc: List of active todos
+          path: /active
+
+        - name: completed
+          doc: List of completed todos
+          path: /completed
+
+      footer:
+        - name: footer
+          default: true
+          doc: Status and controls for todo list
