@@ -2,27 +2,29 @@
 (function (window) {
 	'use strict';
 
-	// Your starting point. Enjoy the ride!
 	window.treetop.init({
 		'mountAttrs': {
 			'single-action': (elm) => {
+				// allows a single input element to be treated as if it is a form.
+				// for the purpose of treetop requests
 				const url = elm.getAttribute('single-action');
 				var type = (elm.getAttribute('type') || 'text').toUpperCase();
+				var method = elm.getAttribute('method');
+				switch (method.toUpperCase()) {
+				case 'POST':
+					method = 'POST';
+					break;
+
+				case 'GET':
+				case '':
+					method = 'GET';
+					break;
+
+				default:
+					throw new Error('Single-action component: unsupported method ' + method);
+				}
+
 				elm.addEventListener('click', () => {
-					var method = elm.getAttribute('method');
-					switch (method.toUpperCase()) {
-					case 'POST':
-						method = 'POST';
-						break;
-
-					case 'GET':
-					case '':
-						method = 'GET';
-						break;
-
-					default:
-						throw new Error('Single-action component: unsupported method ' + method);
-					}
 					const data = new window.FormData();
 					if ((type != 'CHECKBOX' && type != 'RADIO') || elm.checked) {
 						data.append(elm.name, elm.value);
