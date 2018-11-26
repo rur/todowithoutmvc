@@ -42,9 +42,8 @@ func (s *server) Bind(f ResourcesHandler) treetop.HandlerFunc {
 		if rsc == nil {
 			todos, key := s.LoadTodos(req)
 			if key == "" {
-				// no todos key has been recorded, set a new cookie and create an empty list
+				// no todos key has been recorded, set a new cookie
 				key = createTodoCookie(rsp)
-				todos = s.repo.NewTodos()
 			}
 
 			rsc = &Resources{
@@ -70,14 +69,14 @@ func (s *server) LoadTodos(req *http.Request) (todonomvc.Todos, string) {
 	if cookie, err := req.Cookie(CookieName); err == nil {
 		key = cookie.Value
 	} else {
-		return nil, ""
+		return s.repo.NewTodos(), ""
 	}
 	s.RLock()
 	defer s.RUnlock()
 	if todos, ok := s.repo[key]; ok {
 		return todos, key
 	} else {
-		return nil, ""
+		return s.repo.NewTodos(), key
 	}
 }
 

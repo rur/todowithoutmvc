@@ -8,14 +8,24 @@ type Todo struct {
 
 type Todos []Todo
 
-func (t Todos) ClearCompleted() Todos {
-	activeOnly := t[:0]
+func (t Todos) ActiveOnly() Todos {
+	filtered := t[:0]
 	for _, todo := range t {
 		if todo.Active {
-			activeOnly = append(activeOnly, todo)
+			filtered = append(filtered, todo)
 		}
 	}
-	return activeOnly
+	return filtered
+}
+
+func (t Todos) CompletedOnly() Todos {
+	filtered := t[:0]
+	for _, todo := range t {
+		if !todo.Active {
+			filtered = append(filtered, todo)
+		}
+	}
+	return filtered
 }
 
 type Repository map[string][]Todo

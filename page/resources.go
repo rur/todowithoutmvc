@@ -8,7 +8,7 @@ import (
 )
 
 type Resources struct {
-	Todos  []todonomvc.Todo
+	Todos  todonomvc.Todos
 	Update func(todonomvc.Todos) error
 }
 

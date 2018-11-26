@@ -1,7 +1,6 @@
 package todo
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -27,8 +26,9 @@ func todoPageHandler(rsc page.Resources, rsp treetop.Response, req *http.Request
 // Doc: Status and controls for todo list
 func footerHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) interface{} {
 	data := struct {
-		Page    string
-		Message string
+		Page  string
+		Count int
+		Label string
 	}{}
 	if strings.HasPrefix(req.RequestURI, "/active") {
 		data.Page = "active"
@@ -37,18 +37,16 @@ func footerHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) 
 	} else {
 		data.Page = "all"
 	}
-	left := 0
 	for _, t := range rsc.Todos {
 		if t.Active {
-			left = left + 1
+			data.Count = data.Count + 1
 		}
 	}
-	if left == 1 {
-		data.Message = "1 item left"
+	if data.Count == 1 {
+		data.Label = "item left"
 	} else {
-		data.Message = fmt.Sprintf("%d items left", left)
+		data.Label = "items left"
 	}
-
 	return data
 }
 
@@ -56,21 +54,11 @@ func footerHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) 
 // Extends: main
 // Doc: List of all todos, filter based upon path
 func todoHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) interface{} {
-	filtered := rsc.Todos[:0]
+	filtered := rsc.Todos
 	if strings.HasPrefix(req.RequestURI, "/active") {
-		for _, todo := range rsc.Todos {
-			if todo.Active {
-				filtered = append(filtered, todo)
-			}
-		}
+		filtered = rsc.Todos.ActiveOnly()
 	} else if strings.HasPrefix(req.RequestURI, "/completed") {
-		for _, todo := range rsc.Todos {
-			if !todo.Active {
-				filtered = append(filtered, todo)
-			}
-		}
-	} else {
-		filtered = rsc.Todos
+		filtered = rsc.Todos.CompletedOnly()
 	}
 
 	return struct {
@@ -88,7 +76,7 @@ func clearHandler(server page.Server) http.HandlerFunc {
 			http.Error(w, "Todo list was not found", http.StatusBadRequest)
 			return
 		}
-		activeOnly := todos.ClearCompleted()
+		activeOnly := todos.ActiveOnly()
 		if err := server.SaveTodos(key, activeOnly); err != nil {
 			http.Error(w, "Error saving todo list", http.StatusInternalServerError)
 			return
