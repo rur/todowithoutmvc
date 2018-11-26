@@ -12,7 +12,7 @@ import (
 
 // todo (page)
 // Doc: Todo *No* MVC base template
-func todoPageHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) interface{} {
+func todoPageHandler(rsp treetop.Response, req *http.Request) interface{} {
 	return struct {
 		Footer interface{}
 		Main   interface{}
@@ -25,15 +25,15 @@ func todoPageHandler(rsc page.Resources, rsp treetop.Response, req *http.Request
 // footer (default partial)
 // Extends: footer
 // Doc: Status and controls for todo list
-func footerHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) interface{} {
+func footerHandler(todos todowithoutmvc.Todos, rsp treetop.Response, req *http.Request) interface{} {
 	data := struct {
 		Page           string
 		ActiveCount    int
 		CompletedCount int
 		Label          string
 	}{
-		ActiveCount:    rsc.Todos.ActiveCount(),
-		CompletedCount: rsc.Todos.CompletedCount(),
+		ActiveCount:    todos.ActiveCount(),
+		CompletedCount: todos.CompletedCount(),
 	}
 	if data.ActiveCount == 1 {
 		data.Label = "item left"
@@ -53,12 +53,12 @@ func footerHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) 
 // handler for all todo list GET requests
 // Extends: main
 // Doc: List of all todos, filter based upon path
-func todoHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) interface{} {
-	filtered := rsc.Todos
+func todoHandler(todos todowithoutmvc.Todos, rsp treetop.Response, req *http.Request) interface{} {
+	filtered := todos
 	if strings.HasPrefix(req.RequestURI, "/active") {
-		filtered = rsc.Todos.ActiveOnly()
+		filtered = todos.ActiveOnly()
 	} else if strings.HasPrefix(req.RequestURI, "/completed") {
-		filtered = rsc.Todos.CompletedOnly()
+		filtered = todos.CompletedOnly()
 	}
 
 	return struct {
@@ -68,7 +68,7 @@ func todoHandler(rsc page.Resources, rsp treetop.Response, req *http.Request) in
 	}
 }
 
-// Doc: Purge all non active todos and redirect afterwards
+// Doc: Purge all non active todos and redirect
 func clearHandler(server page.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if strings.ToLower(req.Method) != "post" {
@@ -93,7 +93,7 @@ func clearHandler(server page.Server) http.HandlerFunc {
 	}
 }
 
-// Doc: Create a new todo entry
+// Doc: Create a new todo entry and redirect
 func createHandler(server page.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if strings.ToLower(req.Method) != "post" {
@@ -122,7 +122,7 @@ func createHandler(server page.Server) http.HandlerFunc {
 	}
 }
 
-// Doc: Toggle completeness of existing todo entry
+// Doc: Toggle completeness of existing todo entry and redirect
 func toggleHandler(server page.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if strings.ToLower(req.Method) != "post" {

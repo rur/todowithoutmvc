@@ -8,7 +8,7 @@ import (
 func Routes(server page.Server, m page.Mux, renderer *treetop.Renderer) {
 	pageView := renderer.NewView(
 		"page/todo/templates/index.templ.html",
-		server.Bind(todoPageHandler),
+		todoPageHandler,
 	)
 
 	// footer

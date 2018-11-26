@@ -13,49 +13,31 @@ import (
 
 var CookieName = "todowithoutmvc-session"
 
+type TodoHandler func(todowithoutmvc.Todos, treetop.Response, *http.Request) interface{}
+
 type Server interface {
-	Bind(ResourcesHandler) treetop.HandlerFunc
+	Bind(TodoHandler) treetop.HandlerFunc
 	LoadTodos(*http.Request) (todowithoutmvc.Todos, string)
 	SaveTodos(string, todowithoutmvc.Todos) error
 }
 
 func NewServer(repo todowithoutmvc.Repository) Server {
 	return &server{
-		responses: make(map[uint32]*Resources),
-		repo:      repo,
+		repo: repo,
 	}
 }
 
 type server struct {
 	sync.RWMutex
-	responses map[uint32]*Resources
-	repo      todowithoutmvc.Repository
+	repo todowithoutmvc.Repository
 }
 
-func (s *server) Bind(f ResourcesHandler) treetop.HandlerFunc {
+func (s *server) Bind(f TodoHandler) treetop.HandlerFunc {
 	return func(rsp treetop.Response, req *http.Request) interface{} {
 		// Here the Treetop response ID is being used to permit resources to be shared
 		// between data handlers, within the scope of a request.
-		respId := rsp.ResponseID()
-		rsc := s.getResources(respId)
-
-		if rsc == nil {
-			todos, key := s.LoadTodos(req)
-			if key == "" {
-				// no todos key has been recorded, set a new cookie
-				key = CreateTodoCookie(rsp)
-			}
-
-			rsc = &Resources{todos}
-
-			s.setResources(respId, rsc)
-			go func() {
-				<-rsp.Context().Done()
-				// assume that the request lifecycle is finished, just free up resources
-				s.deleteResources(respId)
-			}()
-		}
-		return f(*rsc, rsp, req)
+		todos, _ := s.LoadTodos(req)
+		return f(todos, rsp, req)
 	}
 }
 
@@ -83,30 +65,6 @@ func (s *server) SaveTodos(key string, list todowithoutmvc.Todos) error {
 	defer s.Unlock()
 	s.repo[key] = list
 	return nil
-}
-
-// attempt to load Resources from the server cache
-func (s *server) getResources(respId uint32) *Resources {
-	s.RLock()
-	defer s.RUnlock()
-	if rsc, ok := s.responses[respId]; ok {
-		return rsc
-	} else {
-		return nil
-	}
-}
-
-func (s *server) setResources(respId uint32, rsc *Resources) {
-	s.Lock()
-	defer s.Unlock()
-	s.responses[respId] = rsc
-}
-
-// remove Resources from the cache for a given treetop response ID, delete is idempotent
-func (s *server) deleteResources(respId uint32) {
-	s.Lock()
-	defer s.Unlock()
-	delete(s.responses, respId)
 }
 
 func CreateTodoCookie(w http.ResponseWriter) string {
