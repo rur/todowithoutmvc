@@ -14,7 +14,7 @@ type Resources struct {
 
 type Mux interface {
 	Handle(pattern string, handler http.Handler)
-	HandleFunc(pattern string, handler http.HandlerFunc)
+	HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
 }
 
 type ResourcesHandler func(Resources, treetop.Response, *http.Request) interface{}
