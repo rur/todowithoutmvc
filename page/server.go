@@ -34,8 +34,11 @@ type server struct {
 
 func (s *server) Bind(f TodoHandler) treetop.HandlerFunc {
 	return func(rsp treetop.Response, req *http.Request) interface{} {
-		// Here the Treetop response ID is being used to permit resources to be shared
-		// between data handlers, within the scope of a request.
+		// load user todo list from repo based upon request cookies
+		// pass to handler.
+		//
+		// Note that these handlers have no way to making changes
+		// to the todo list.
 		todos, _ := s.LoadTodos(req)
 		return f(todos, rsp, req)
 	}
