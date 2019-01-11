@@ -1,7 +1,7 @@
 namespace: github.com/rur/todowithoutmvc
 pages:
   - name: todo
-    doc: Todo *No* MVC base template
+    doc: Todo *Without* MVC base template
     uri: /
     blocks:
       main:

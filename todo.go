@@ -76,7 +76,7 @@ func (t *todos) CompletedCount() int {
 }
 
 func (t *todos) List() []Todo {
-	return t.list
+	return append([]Todo{}, t.list...)
 }
 
 func (t *todos) CompletedOnly() Todos {
