@@ -181,19 +181,10 @@ func toggleAllHandler(server page.Server) http.HandlerFunc {
 			return
 		}
 
-		var items []todowithoutmvc.Todo
-		if strings.HasPrefix(req.RequestURI, "/active") {
-			items = todos.ActiveOnly().List()
-		} else if strings.HasPrefix(req.RequestURI, "/completed") {
-			items = todos.CompletedOnly().List()
-		} else {
-			items = todos.List()
-		}
-
 		setComplete := strings.ToLower(strings.TrimSpace(req.FormValue("completed"))) == "completed"
 
 		var err error
-		for _, item := range items {
+		for _, item := range todos.List() {
 			item.Active = !setComplete
 			todos, err = todos.UpdateEntry(item)
 			if err != nil {
