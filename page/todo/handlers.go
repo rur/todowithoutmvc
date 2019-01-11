@@ -120,7 +120,7 @@ func createHandler(server page.Server) http.HandlerFunc {
 			return
 		}
 		redirect := req.Referer()
-		if redirect == "" {
+		if redirect == "" || strings.Contains(redirect, "/completed") {
 			redirect = "/"
 		}
 		http.Redirect(w, req, redirect, http.StatusSeeOther)
