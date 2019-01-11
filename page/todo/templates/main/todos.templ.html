@@ -1,6 +1,6 @@
 {{ block "main" . }}
 <section id="main" class="main">
-    <input id="toggle-all" class="toggle-all" type="checkbox">
+    <input id="toggle-all" class="toggle-all" type="checkbox" input-submit="/toggle-all" method="POST" name="completed" value="completed" {{ if .AllCompleted }}checked{{ end }}>
     <label for="toggle-all">Mark all as complete</label>
     <ul class="todo-list">
         <!-- These are here just to show the structure of the list items -->

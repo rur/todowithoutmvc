@@ -12,7 +12,7 @@
 					return;
 				}
 				var type = (elm.getAttribute('type') || 'text').toUpperCase();
-				var method = elm.getAttribute('method');
+				var method = elm.getAttribute('method') || 'GET';
 				switch (method.toUpperCase()) {
 				case 'POST':
 					method = 'POST';

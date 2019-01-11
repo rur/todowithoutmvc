@@ -25,13 +25,14 @@ func Routes(server page.Server, m page.Mux, renderer *treetop.Renderer) {
 		server.Bind(todoHandler),
 	)
 
-	m.Handle("/", todo.PartialHandler().Include(footer))
-	m.Handle("/active", todo.PartialHandler().Include(footer))
-	m.Handle("/completed", todo.PartialHandler().Include(footer))
+	m.Handle("/", treetop.ViewHandler(todo, footer))
+	m.Handle("/active", treetop.ViewHandler(todo, footer))
+	m.Handle("/completed", treetop.ViewHandler(todo, footer))
 
 	// None treetop view handlers
 	// I'm using POST redirect GET for all side-effect endpoints
 	m.HandleFunc("/clear", clearHandler(server))
 	m.HandleFunc("/create", createHandler(server))
 	m.HandleFunc("/toggle", toggleHandler(server))
+	m.HandleFunc("/toggle-all", toggleAllHandler(server))
 }

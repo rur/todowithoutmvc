@@ -54,18 +54,23 @@ func footerHandler(todos todowithoutmvc.Todos, rsp treetop.Response, req *http.R
 // Extends: main
 // Doc: List of all todos, filter based upon path
 func todoHandler(todos todowithoutmvc.Todos, rsp treetop.Response, req *http.Request) interface{} {
-	filtered := todos
+	data := struct {
+		Todos        []todowithoutmvc.Todo
+		AllCompleted bool
+	}{}
+
 	if strings.HasPrefix(req.RequestURI, "/active") {
-		filtered = todos.ActiveOnly()
+		data.Todos = todos.ActiveOnly().List()
+		data.AllCompleted = false
 	} else if strings.HasPrefix(req.RequestURI, "/completed") {
-		filtered = todos.CompletedOnly()
+		data.Todos = todos.CompletedOnly().List()
+		data.AllCompleted = true
+	} else {
+		data.Todos = todos.List()
+		data.AllCompleted = len(data.Todos) > 0 && len(data.Todos) == todos.CompletedCount()
 	}
 
-	return struct {
-		Todos []todowithoutmvc.Todo
-	}{
-		Todos: filtered.List(),
-	}
+	return data
 }
 
 // Doc: Purge all non active todos and redirect
@@ -155,6 +160,52 @@ func toggleHandler(server page.Server) http.HandlerFunc {
 			return
 		}
 
+		redirect := req.Referer()
+		if redirect == "" {
+			redirect = "/"
+		}
+		http.Redirect(w, req, redirect, http.StatusSeeOther)
+	}
+}
+
+// Doc: Toggle completeness of subset of todo entries and redirect
+func toggleAllHandler(server page.Server) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		if strings.ToLower(req.Method) != "post" {
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
+		todos, key := server.LoadTodos(req)
+		if key == "" {
+			http.Error(w, "Todo list was not found", http.StatusBadRequest)
+			return
+		}
+
+		var items []todowithoutmvc.Todo
+		if strings.HasPrefix(req.RequestURI, "/active") {
+			items = todos.ActiveOnly().List()
+		} else if strings.HasPrefix(req.RequestURI, "/completed") {
+			items = todos.CompletedOnly().List()
+		} else {
+			items = todos.List()
+		}
+
+		setComplete := strings.ToLower(strings.TrimSpace(req.FormValue("completed"))) == "completed"
+
+		var err error
+		for _, item := range items {
+			item.Active = !setComplete
+			todos, err = todos.UpdateEntry(item)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Failed to update todo item #%s", item.ID), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		if err := server.SaveTodos(key, todos); err != nil {
+			http.Error(w, "Error saving todo list", http.StatusInternalServerError)
+			return
+		}
 		redirect := req.Referer()
 		if redirect == "" {
 			redirect = "/"

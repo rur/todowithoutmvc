@@ -43,7 +43,7 @@ type todos struct {
 }
 
 func (t *todos) ActiveOnly() Todos {
-	filtered := t.list[:0]
+	filtered := []Todo{}
 	for _, todo := range t.list {
 		if todo.Active {
 			filtered = append(filtered, todo)
@@ -80,7 +80,7 @@ func (t *todos) List() []Todo {
 }
 
 func (t *todos) CompletedOnly() Todos {
-	filtered := t.list[:0]
+	filtered := []Todo{}
 	for _, todo := range t.list {
 		if !todo.Active {
 			filtered = append(filtered, todo)
@@ -118,14 +118,16 @@ func (t *todos) GetEntry(id string) (*Todo, bool) {
 }
 
 func (t *todos) UpdateEntry(nue Todo) (Todos, error) {
-	var list []Todo
-	for i, ti := range t.list {
+	list := append([]Todo{}, t.list...)
+	found := false
+	for i, ti := range list {
 		if ti.ID == nue.ID {
-			list = append(t.list[:i], append([]Todo{nue}, t.list[i+1:]...)...)
-			continue
+			list[i] = nue
+			found = true
+			break
 		}
 	}
-	if list == nil {
+	if !found {
 		return t, fmt.Errorf("Entry not found with item ID %s", nue.ID)
 	}
 	return &todos{
