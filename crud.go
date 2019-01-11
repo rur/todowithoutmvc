@@ -101,7 +101,7 @@ func ToggleHandler(server Server) http.HandlerFunc {
 	}
 }
 
-// Doc: Toggle completeness of subset of todo entries and redirect
+// Doc: Toggle completeness of all todo entries and redirect
 func ToggleAllHandler(server Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if strings.ToLower(req.Method) != "post" {
