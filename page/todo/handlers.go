@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/rur/todowithoutmvc"
+	"github.com/rur/todowithoutmvc/app"
 	"github.com/rur/treetop"
 )
 
@@ -23,7 +23,7 @@ func todoPageHandler(rsp treetop.Response, req *http.Request) interface{} {
 // footer (default partial)
 // Extends: footer
 // Doc: Status and controls for todo list
-func footerHandler(todos todowithoutmvc.Todos, rsp treetop.Response, req *http.Request) interface{} {
+func footerHandler(todos app.Todos, rsp treetop.Response, req *http.Request) interface{} {
 	data := struct {
 		Page           string
 		ActiveCount    int
@@ -51,9 +51,9 @@ func footerHandler(todos todowithoutmvc.Todos, rsp treetop.Response, req *http.R
 // handler for all todo list GET requests
 // Extends: main
 // Doc: List of all todos, filter based upon path
-func todoHandler(todos todowithoutmvc.Todos, rsp treetop.Response, req *http.Request) interface{} {
+func todoHandler(todos app.Todos, rsp treetop.Response, req *http.Request) interface{} {
 	data := struct {
-		Todos        []todowithoutmvc.Todo
+		Todos        []app.Todo
 		AllCompleted bool
 	}{}
 

@@ -5,7 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/rur/todowithoutmvc"
+	"github.com/rur/todowithoutmvc/app"
+	"github.com/rur/todowithoutmvc/page"
 	"github.com/rur/todowithoutmvc/page/todo"
 	"github.com/rur/treetop"
 )
@@ -25,18 +26,20 @@ func main() {
 	modules := http.FileServer(http.Dir("node_modules"))
 	m.Handle("/node_modules/", http.StripPrefix("/node_modules/", modules))
 
-	server := todowithoutmvc.NewServer(
-		todowithoutmvc.NewMemoryRepo(),
+	// maintains all server state and configuration
+	s := app.NewServer(app.NewMemoryRepo())
+
+	todo.Routes(
+		page.NewContext(s),
+		m,
+		treetop.NewRenderer(treetop.DefaultTemplateExec),
 	)
 
-	renderer := treetop.NewRenderer(treetop.DefaultTemplateExec)
-	todo.Routes(server, m, renderer)
-
 	// I'm using POST redirect GET for all side-effect endpoints
-	m.HandleFunc("/clear", todowithoutmvc.ClearHandler(server))
-	m.HandleFunc("/create", todowithoutmvc.CreateHandler(server))
-	m.HandleFunc("/toggle", todowithoutmvc.ToggleHandler(server))
-	m.HandleFunc("/toggle-all", todowithoutmvc.ToggleAllHandler(server))
+	m.HandleFunc("/clear", app.ClearHandler(s))
+	m.HandleFunc("/create", app.CreateHandler(s))
+	m.HandleFunc("/toggle", app.ToggleHandler(s))
+	m.HandleFunc("/toggle-all", app.ToggleAllHandler(s))
 
 	fmt.Printf("Starting github.com/rur/todowithoutmvc server at %s", addr)
 	// Bind to an addr and pass our router in

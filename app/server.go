@@ -1,4 +1,4 @@
-package todowithoutmvc
+package app
 
 import (
 	"errors"
@@ -6,16 +6,11 @@ import (
 	"strconv"
 	"sync"
 	"time"
-
-	"github.com/rur/treetop"
 )
 
 var CookieName = "todowithoutmvc-session"
 
-type TodoHandler func(Todos, treetop.Response, *http.Request) interface{}
-
 type Server interface {
-	Bind(TodoHandler) treetop.HandlerFunc
 	LoadTodos(*http.Request) (Todos, string)
 	SaveTodos(string, Todos) error
 }
@@ -29,18 +24,6 @@ func NewServer(repo Repository) Server {
 type server struct {
 	sync.RWMutex
 	repo Repository
-}
-
-func (s *server) Bind(f TodoHandler) treetop.HandlerFunc {
-	return func(rsp treetop.Response, req *http.Request) interface{} {
-		// load user todo list from repo based upon request cookies
-		// pass to handler.
-		//
-		// Note that these handlers have no way to making changes
-		// to the todo list.
-		todos, _ := s.LoadTodos(req)
-		return f(todos, rsp, req)
-	}
 }
 
 func (s *server) LoadTodos(req *http.Request) (Todos, string) {
