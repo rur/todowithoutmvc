@@ -1,27 +1,26 @@
-package todo
+package page
 
 import (
-	"github.com/rur/todowithoutmvc/page"
 	"github.com/rur/treetop"
 )
 
-func Routes(cxt page.Context, m page.Mux, renderer *treetop.Renderer) {
+func Routes(cxt Context, m Mux, renderer *treetop.Renderer) {
 	pageView := renderer.NewView(
-		"page/todo/templates/index.templ.html",
+		"page/templates/index.templ.html",
 		todoPageHandler,
 	)
 	footer := pageView.DefaultSubView(
 		"footer",
-		"page/todo/templates/footer.templ.html",
+		"page/templates/footer.templ.html",
 		cxt.Bind(footerHandler),
 	)
 	todo := pageView.DefaultSubView(
 		"main",
-		"page/todo/templates/todos.templ.html",
+		"page/templates/todos.templ.html",
 		cxt.Bind(todoHandler),
 	)
 	editItem := renderer.NewView(
-		"page/todo/templates/edit.templ.html",
+		"page/templates/edit.templ.html",
 		cxt.Bind(editTodoHandler),
 	)
 

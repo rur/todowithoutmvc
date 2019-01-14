@@ -7,7 +7,6 @@ import (
 
 	"github.com/rur/todowithoutmvc/app"
 	"github.com/rur/todowithoutmvc/page"
-	"github.com/rur/todowithoutmvc/page/todo"
 	"github.com/rur/treetop"
 )
 
@@ -29,7 +28,7 @@ func main() {
 	// maintains all server state and configuration
 	s := app.NewServer(app.NewMemoryRepo())
 
-	todo.Routes(
+	page.Routes(
 		page.NewContext(s),
 		m,
 		treetop.NewRenderer(treetop.DefaultTemplateExec),
