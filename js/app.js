@@ -37,6 +37,8 @@
 				});
 			},
 			'double-click-link': function (el) {
+				// equivalent to treetop-link except activating it requires
+				// two successive clicks within 0.8 seconds.
 				function dblClick(_evt) {
 					var evt = _evt || window.event;
 					var elm = evt.target || evt.srcElement;
@@ -52,19 +54,16 @@
 						elm.__lastClicked__ = ts;
 					}
 				}
-
-				if (el.addEventListener) {
-					el.addEventListener('click', dblClick, false);
-				} else if (el.attachEvent) {
-					el.attachEvent('onclick', dblClick);
-				}
+				el.addEventListener('click', dblClick, false);
 			},
 			'autoselect': function (el) {
+				// select the contents of an input element as soon as it is mounted to the DOM
 				setTimeout(function () {
 					el.select();
 				});
 			},
 			'blur-submit': function (el) {
+				// blur even on an input element will cause the enclosing form to be submitted
 				function onBlur(_evt) {
 					var evt = _evt || window.event;
 					var elm = evt.target || evt.srcElement;
@@ -81,11 +80,7 @@
 						elm.submit();
 					}
 				}
-				if (el.addEventListener) {
-					el.addEventListener('blur', onBlur, false);
-				} else if (el.attachEvent) {
-					el.attachEvent('onblur', onBlur);
-				}
+				el.addEventListener('blur', onBlur, false);
 			}
 		}
 	});
