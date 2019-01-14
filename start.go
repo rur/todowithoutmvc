@@ -15,33 +15,34 @@ var (
 )
 
 func main() {
-	m := http.NewServeMux()
+	mux := http.NewServeMux()
 
 	// static files
 	js := http.FileServer(http.Dir("js"))
-	m.Handle("/js/", http.StripPrefix("/js/", js))
+	mux.Handle("/js/", http.StripPrefix("/js/", js))
 	css := http.FileServer(http.Dir("css"))
-	m.Handle("/css/", http.StripPrefix("/css/", css))
+	mux.Handle("/css/", http.StripPrefix("/css/", css))
 	modules := http.FileServer(http.Dir("node_modules"))
-	m.Handle("/node_modules/", http.StripPrefix("/node_modules/", modules))
+	mux.Handle("/node_modules/", http.StripPrefix("/node_modules/", modules))
 
-	// maintains all server state and configuration
-	s := app.NewServer(app.NewMemoryRepo())
+	// server maintains all state and configuration
+	server := app.NewServer(app.NewMemoryRepo())
 
+	// Treetop view config
 	page.Routes(
-		page.NewContext(s),
-		m,
+		page.NewContext(server),
+		mux,
 		treetop.NewRenderer(treetop.DefaultTemplateExec),
 	)
 
-	// I'm using POST redirect GET for all side-effect endpoints
-	m.HandleFunc("/clear", app.ClearHandler(s))
-	m.HandleFunc("/create", app.CreateHandler(s))
-	m.HandleFunc("/toggle", app.ToggleHandler(s))
-	m.HandleFunc("/toggle-all", app.ToggleAllHandler(s))
-	m.HandleFunc("/update", app.UpdateHandler(s))
+	// CRUD handlers
+	// POST/Redirect/GET is used for all side-effect endpoints
+	mux.HandleFunc("/clear", app.ClearHandler(server))
+	mux.HandleFunc("/create", app.CreateHandler(server))
+	mux.HandleFunc("/toggle", app.ToggleHandler(server))
+	mux.HandleFunc("/toggle-all", app.ToggleAllHandler(server))
+	mux.HandleFunc("/update", app.UpdateHandler(server))
 
 	fmt.Printf("Starting github.com/rur/todowithoutmvc server at %s", addr)
-	// Bind to an addr and pass our router in
-	log.Fatal(http.ListenAndServe(addr, m))
+	log.Fatal(http.ListenAndServe(addr, mux))
 }
