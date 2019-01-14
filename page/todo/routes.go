@@ -10,22 +10,17 @@ func Routes(cxt page.Context, m page.Mux, renderer *treetop.Renderer) {
 		"page/todo/templates/index.templ.html",
 		todoPageHandler,
 	)
-
-	// footer
 	footer := pageView.DefaultSubView(
 		"footer",
-		"page/todo/templates/footer/footer.templ.html",
+		"page/todo/templates/footer.templ.html",
 		cxt.Bind(footerHandler),
 	)
-
-	// main
 	todo := pageView.DefaultSubView(
 		"main",
-		"page/todo/templates/main/todos.templ.html",
+		"page/todo/templates/todos.templ.html",
 		cxt.Bind(todoHandler),
 	)
-
-	edit := renderer.NewView(
+	editItem := renderer.NewView(
 		"page/todo/templates/edit.templ.html",
 		cxt.Bind(editTodoHandler),
 	)
@@ -33,5 +28,5 @@ func Routes(cxt page.Context, m page.Mux, renderer *treetop.Renderer) {
 	m.Handle("/", treetop.ViewHandler(todo, footer))
 	m.Handle("/active", treetop.ViewHandler(todo, footer))
 	m.Handle("/completed", treetop.ViewHandler(todo, footer))
-	m.Handle("/edit", treetop.ViewHandler(edit).FragmentOnly())
+	m.Handle("/edit", treetop.ViewHandler(editItem).FragmentOnly())
 }
