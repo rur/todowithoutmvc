@@ -25,7 +25,13 @@ func Routes(cxt page.Context, m page.Mux, renderer *treetop.Renderer) {
 		cxt.Bind(todoHandler),
 	)
 
+	edit := renderer.NewView(
+		"page/todo/templates/edit.templ.html",
+		cxt.Bind(editTodoHandler),
+	)
+
 	m.Handle("/", treetop.ViewHandler(todo, footer))
 	m.Handle("/active", treetop.ViewHandler(todo, footer))
 	m.Handle("/completed", treetop.ViewHandler(todo, footer))
+	m.Handle("/edit", treetop.ViewHandler(edit).FragmentOnly())
 }

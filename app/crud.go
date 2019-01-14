@@ -137,3 +137,42 @@ func ToggleAllHandler(s Server) http.HandlerFunc {
 		http.Redirect(w, req, redirect, http.StatusSeeOther)
 	}
 }
+
+// Doc: update contents of a given todo item
+func UpdateHandler(s Server) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		if strings.ToLower(req.Method) != "post" {
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
+		todos, key := s.LoadTodos(req)
+		if key == "" {
+			http.Error(w, "Todo list was not found", http.StatusBadRequest)
+			return
+		}
+		itemID := strings.TrimSpace(req.URL.Query().Get("item"))
+
+		todo, ok := todos.GetEntry(itemID)
+		if !ok {
+			http.Error(w, fmt.Sprintf("Entry was not found for ID: %s", itemID), http.StatusBadRequest)
+			return
+		}
+
+		value := strings.TrimSpace(req.FormValue("content"))
+		todo.Content = value
+
+		if updated, err := todos.UpdateEntry(*todo); err != nil {
+			http.Error(w, fmt.Sprintf("Error saving todo entry %s", err), http.StatusInternalServerError)
+			return
+		} else if err := s.SaveTodos(key, updated); err != nil {
+			http.Error(w, fmt.Sprintf("Error saving todo list %s", err), http.StatusInternalServerError)
+			return
+		}
+
+		redirect := req.Referer()
+		if redirect == "" {
+			redirect = "/"
+		}
+		http.Redirect(w, req, redirect, http.StatusSeeOther)
+	}
+}

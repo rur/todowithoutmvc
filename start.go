@@ -40,6 +40,7 @@ func main() {
 	m.HandleFunc("/create", app.CreateHandler(s))
 	m.HandleFunc("/toggle", app.ToggleHandler(s))
 	m.HandleFunc("/toggle-all", app.ToggleAllHandler(s))
+	m.HandleFunc("/update", app.UpdateHandler(s))
 
 	fmt.Printf("Starting github.com/rur/todowithoutmvc server at %s", addr)
 	// Bind to an addr and pass our router in

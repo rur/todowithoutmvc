@@ -13,7 +13,7 @@
 		<section class="todoapp">
 			<header class="header">
 				<h1>todos</h1>
-				<form treetop action="/create" method="POST" onsubmit="setTimeout(this.reset.bind(this));"><input type="text" name="todo" class="new-todo" placeholder="What needs to be done?" autofocus></form>
+				<form treetop action="/create" method="POST" onsubmit="setTimeout(this.reset.bind(this));"><input type="text" name="todo" class="new-todo" placeholder="What needs to be done?" autofocus autocomplete="off"></form>
 			</header>
 			{{ block "main" .Main }}
 			<!-- This section should be hidden by default and shown when there are todos -->

@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -74,4 +75,21 @@ func todoHandler(todos app.Todos, rsp treetop.Response, req *http.Request) inter
 	}
 
 	return data
+}
+
+// handler for loading an edit todo form
+// Doc: configure a HTML form element which will be used to update the content of an existing todo
+func editTodoHandler(todos app.Todos, rsp treetop.Response, req *http.Request) interface{} {
+	todoID := req.URL.Query().Get("item")
+	if todoID == "" {
+		http.Error(rsp, "Missing Todo ID", http.StatusBadRequest)
+	}
+
+	if todo, found := todos.GetEntry(todoID); !found {
+		// using `rsp` as a http.ResposeWriter will safely abort the Treetop response process.
+		http.Error(rsp, fmt.Sprintf("Invalid todo ID: %s", todoID), http.StatusBadRequest)
+		return nil
+	} else {
+		return todo
+	}
 }

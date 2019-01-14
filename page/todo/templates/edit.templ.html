@@ -1,0 +1,5 @@
+<li id="todo-{{ .ID }}" class="editing">
+	<form treetop action="/update?item={{ .ID }}" method="post">
+		<input class="edit" value="{{ .Content }}" name="content" type="text" autoselect blur-submit autocomplete="off">
+	</form>
+</li>
