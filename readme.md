@@ -4,11 +4,9 @@ Fully server side application with all the interactivity of a client MV* applica
 
 ## Fully server side?
 
-There is no client side templating code of any sort. All IO is driven through XHR and HTML fragments.
+There is no client side templating code of any sort. All IO is driven through HTTP requests with HTML fragments.
 
 See [Treetop](https://github.com/rur/treetop) for more details.
-
-App template by [TodoMVC App Template](https://github.com/tastejs/todomvc-app-template)
 
 ## Build Instructions
 
