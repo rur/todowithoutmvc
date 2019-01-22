@@ -118,3 +118,22 @@ func (t *todos) UpdateEntry(nue Todo) (Todos, error) {
 		lastID: t.lastID,
 	}, nil
 }
+
+func (t *todos) RemoveEntry(id string) (Todos, error) {
+	list := t.list[:0]
+	found := false
+	for _, ti := range t.list {
+		if ti.ID == id {
+			found = true
+		} else {
+			list = append(list, ti)
+		}
+	}
+	if !found {
+		return t, fmt.Errorf("Entry not found with item ID %s", id)
+	}
+	return &todos{
+		list:   list,
+		lastID: t.lastID,
+	}, nil
+}

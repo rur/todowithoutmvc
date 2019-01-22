@@ -42,6 +42,7 @@ func main() {
 	mux.HandleFunc("/toggle", app.ToggleHandler(server))
 	mux.HandleFunc("/toggle-all", app.ToggleAllHandler(server))
 	mux.HandleFunc("/update", app.UpdateHandler(server))
+	mux.HandleFunc("/remove", app.RemoveHandler(server))
 
 	fmt.Printf("Starting github.com/rur/todowithoutmvc server at %s", addr)
 	log.Fatal(http.ListenAndServe(addr, mux))

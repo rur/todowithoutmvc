@@ -15,4 +15,5 @@ type Todos interface {
 	AddEntry(string) (Todos, error)
 	GetEntry(string) (*Todo, bool)
 	UpdateEntry(Todo) (Todos, error)
+	RemoveEntry(string) (Todos, error)
 }
