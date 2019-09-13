@@ -176,3 +176,33 @@ func UpdateHandler(s Server) http.HandlerFunc {
 		http.Redirect(w, req, redirect, http.StatusSeeOther)
 	}
 }
+
+// Doc: clear an item from the TODO list
+func RemoveHandler(s Server) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		if strings.ToLower(req.Method) != "post" {
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
+		todos, key := s.LoadTodos(req)
+		if key == "" {
+			http.Error(w, "Todo list was not found", http.StatusBadRequest)
+			return
+		}
+		itemID := strings.TrimSpace(req.URL.Query().Get("item"))
+
+		if updated, err := todos.RemoveEntry(itemID); err != nil {
+			http.Error(w, fmt.Sprintf("Error clearing todo entry %s", err), http.StatusInternalServerError)
+			return
+		} else if err := s.SaveTodos(key, updated); err != nil {
+			http.Error(w, fmt.Sprintf("Error saving todo list %s", err), http.StatusInternalServerError)
+			return
+		}
+
+		redirect := req.Referer()
+		if redirect == "" {
+			redirect = "/"
+		}
+		http.Redirect(w, req, redirect, http.StatusSeeOther)
+	}
+}

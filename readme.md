@@ -8,8 +8,6 @@ There are no client side templates of any kind. All IO is driven through HTTP re
 
 See [Treetop](https://github.com/rur/treetop) for more details.
 
-App template by [TodoMVC App Template](https://github.com/tastejs/todomvc-app-template)
-
 ## Build Instructions
 
 Assuming you have a `$GOPATH` setup and `npm` is installed.

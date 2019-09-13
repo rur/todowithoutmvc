@@ -10,7 +10,7 @@
             <div class="view">
                 <input input-submit="/toggle?item={{ .ID }}" method="POST" class="toggle" name="completed" value="completed" type="checkbox" {{ if not .Active }}checked{{ end }}>
                 <label double-click-link="/edit?item={{ .ID }}">{{ .Content }}</label>
-                <button class="destroy"></button>
+                <button input-submit="/remove?item={{ .ID }}" method="POST" class="destroy"></button>
             </div>
             <input class="edit" value="Rule the web">
         </li>
