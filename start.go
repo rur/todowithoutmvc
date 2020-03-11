@@ -28,12 +28,17 @@ func main() {
 	// server maintains all state and configuration
 	server := app.NewServer(app.NewMemoryRepo())
 
+	exec := &treetop.FileExecutor{}
 	// Treetop view config
 	page.Routes(
 		page.NewContext(server),
 		mux,
-		treetop.NewRenderer(treetop.DefaultTemplateExec),
+		exec,
 	)
+
+	if errs := exec.FlushErrors(); len(errs) > 0 {
+		log.Fatal(errs.Error())
+	}
 
 	// CRUD handlers
 	// POST/Redirect/GET is used for all side-effect endpoints

@@ -1,4 +1,9 @@
 /* globals window */
+/*
+Cheap and cheerful JS event handlers used to bind
+user events for crafting treetop XHR requests.
+*/
+
 (function (window) {
 	'use strict';
 
@@ -64,6 +69,7 @@
 			},
 			'blur-submit': function (el) {
 				// blur even on an input element will cause the enclosing form to be submitted
+				// TODO: This is a crude implementation, combined with input-submit it is causing a double-tap currently
 				function onBlur(_evt) {
 					var evt = _evt || window.event;
 					var elm = evt.target || evt.srcElement;

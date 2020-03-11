@@ -13,7 +13,7 @@ type Mux interface {
 }
 
 type Context interface {
-	Bind(TodoHandler) treetop.HandlerFunc
+	Bind(TodoHandler) treetop.ViewHandlerFunc
 }
 
 type cxt struct {
@@ -26,7 +26,7 @@ func NewContext(s app.Server) Context {
 
 type TodoHandler func(app.Todos, treetop.Response, *http.Request) interface{}
 
-func (c *cxt) Bind(f TodoHandler) treetop.HandlerFunc {
+func (c *cxt) Bind(f TodoHandler) treetop.ViewHandlerFunc {
 	return func(rsp treetop.Response, req *http.Request) interface{} {
 		// load user todo list from repo based upon request cookies
 		// pass to handler.

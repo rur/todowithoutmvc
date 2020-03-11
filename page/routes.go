@@ -4,28 +4,28 @@ import (
 	"github.com/rur/treetop"
 )
 
-func Routes(cxt Context, m Mux, renderer *treetop.Renderer) {
-	pageView := renderer.NewView(
+func Routes(cxt Context, m Mux, exec treetop.ViewExecutor) {
+	pageView := treetop.NewView(
 		"page/templates/index.templ.html",
 		todoPageHandler,
 	)
-	footer := pageView.DefaultSubView(
+	footer := pageView.NewDefaultSubView(
 		"footer",
 		"page/templates/footer.templ.html",
 		cxt.Bind(footerHandler),
 	)
-	todo := pageView.DefaultSubView(
+	todo := pageView.NewDefaultSubView(
 		"main",
 		"page/templates/todos.templ.html",
 		cxt.Bind(todoHandler),
 	)
-	editItem := renderer.NewView(
+	editItem := treetop.NewView(
 		"page/templates/edit.templ.html",
 		cxt.Bind(editTodoHandler),
 	)
 
-	m.Handle("/", treetop.ViewHandler(todo, footer))
-	m.Handle("/active", treetop.ViewHandler(todo, footer))
-	m.Handle("/completed", treetop.ViewHandler(todo, footer))
-	m.Handle("/edit", treetop.ViewHandler(editItem).FragmentOnly())
+	m.Handle("/", exec.NewViewHandler(todo, footer))
+	m.Handle("/active", exec.NewViewHandler(todo, footer))
+	m.Handle("/completed", exec.NewViewHandler(todo, footer))
+	m.Handle("/edit", exec.NewViewHandler(editItem).FragmentOnly())
 }

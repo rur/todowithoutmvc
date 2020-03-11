@@ -16,8 +16,8 @@ func todoPageHandler(rsp treetop.Response, req *http.Request) interface{} {
 		Footer interface{}
 		Main   interface{}
 	}{
-		Footer: rsp.HandlePartial("footer", req),
-		Main:   rsp.HandlePartial("main", req),
+		Footer: rsp.HandleSubView("footer", req),
+		Main:   rsp.HandleSubView("main", req),
 	}
 }
 

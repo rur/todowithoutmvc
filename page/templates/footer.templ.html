@@ -1,4 +1,3 @@
-{{ block "footer" . }}
 <footer id="footer" class="footer {{ if and (eq .ActiveCount 0) (eq .CompletedCount 0)  }}hide{{ end }}">
     <!-- This should be `0 items left` by default -->
     <span class="todo-count"><strong>{{ .ActiveCount }}</strong> {{ .Label }}</span>
@@ -19,4 +18,3 @@
     <form treetop action="/clear" method="POST"><button class="clear-completed">Clear completed</button></form>
     {{ end }}
 </footer>
-{{ end }}

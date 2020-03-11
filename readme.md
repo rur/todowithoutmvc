@@ -4,7 +4,7 @@ Fully server side application with all the interactivity of a client MV* applica
 
 ## Fully server side?
 
-There are no client side templates of any kind. All IO is driven through HTTP requests with HTML fragments.
+There are no client side templates of any kind. All IO is driven through HTML template requests.
 
 See [Treetop](https://github.com/rur/treetop) for more details.
 
